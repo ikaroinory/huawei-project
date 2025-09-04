@@ -133,7 +133,7 @@ class Runner:
 
             self.__optimizer.step()
 
-            total_loss += loss.item()
+            total_loss += loss.item() * behavior.shape[0]
 
         return total_loss / len(self.__train_dataloader.dataset)
 
@@ -153,11 +153,11 @@ class Runner:
 
             loss = self.__loss(output, label)
 
-            total_loss += loss.item()
+            total_loss += loss.item() * behavior.shape[0]
 
             pred_labels = (torch.sigmoid(output) >= 0.5).long()
 
-            accuracy += (pred_labels == label).sum().item()
+            accuracy += (pred_labels == label).sum().item() * behavior.shape[0]
 
         return total_loss / len(dataloader.dataset), accuracy / len(dataloader.dataset)
 
