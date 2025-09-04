@@ -8,6 +8,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import torch
+from sklearn.metrics import accuracy_score
+from torch import Tensor
 from torch.nn import BCEWithLogitsLoss
 from torch.optim import Adam
 from torch.utils.data import DataLoader, Subset
@@ -114,6 +116,10 @@ class Runner:
             else:
                 return self.__split_dataset(dataset)
 
+    @staticmethod
+    def get_accuracy(pred_tensor: Tensor, label_tensor: Tensor):
+        return accuracy_score(label_tensor.cpu(), pred_tensor.cpu())
+
     def __train_epoch(self) -> float:
         self.__model.train()
 
@@ -137,11 +143,13 @@ class Runner:
 
         return total_loss / len(self.__train_dataloader.dataset)
 
-    def __test_epoch(self, dataloader: DataLoader) -> tuple[float, float]:
+    def __test_epoch(self, dataloader: DataLoader) -> tuple[float, Tensor, Tensor]:
         self.__model.eval()
 
-        total_loss = 0
+        pred_list = []
+        label_list = []
 
+        total_loss = 0
         accuracy = 0
         for behavior, normal, abnormal, label in tqdm(dataloader):
             behavior = behavior.to(self.args.device)
@@ -159,7 +167,13 @@ class Runner:
 
             accuracy += (pred_labels == label).sum().item() / behavior.shape[0]
 
-        return total_loss / len(dataloader.dataset), accuracy / len(dataloader.dataset)
+            pred_list.append(pred_labels)
+            label_list.append(label)
+
+        pred_tensor = torch.cat(pred_list, dim=0)
+        label_tensor = torch.cat(label_list, dim=0)
+
+        return total_loss / len(dataloader.dataset), pred_tensor, label_tensor
 
     def __train(self) -> None:
         Logger.info('Training...')
@@ -172,7 +186,9 @@ class Runner:
 
         for epoch in tqdm(range(self.args.epochs)):
             train_loss = self.__train_epoch()
-            test_loss, accuracy = self.__test_epoch(self.__train_dataloader)
+            test_loss, pred_tensor, label_tensor = self.__test_epoch(self.__train_dataloader)
+
+            accuracy = self.get_accuracy(pred_tensor, label_tensor)
 
             Logger.info(f'Epoch {epoch + 1}:')
             Logger.info(f' - Train loss: {train_loss:.8f}')
@@ -210,10 +226,12 @@ class Runner:
         Logger.info(f'Accuracy:')
         for api_version in api_version_list:
             if api_version == self.train_api_version:
-                _, accuracy = self.__test_epoch(self.__train_dataloader)
+                _, pred_tensor, label_tensor = self.__test_epoch(self.__train_dataloader)
+                accuracy = self.get_accuracy(pred_tensor, label_tensor)
             else:
                 dataloader, _ = self.__get_dataloaders(api_version, only_test=True)
-                _, accuracy = self.__test_epoch(dataloader)
+                _, pred_tensor, label_tensor = self.__test_epoch(dataloader)
+                accuracy = self.get_accuracy(pred_tensor, label_tensor)
 
             Logger.info(f' - API {api_version}: {accuracy * 100:.2f}%')
 
