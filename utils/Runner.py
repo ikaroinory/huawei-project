@@ -149,7 +149,7 @@ class Runner:
             abnormal = abnormal.to(self.args.device)
             label = label.to(self.args.device)
 
-            output = self.__model(behavior, normal, abnormal)
+            output = self.__model(behavior, normal, abnormal).squeeze()
 
             loss = self.__loss(output, label)
 
