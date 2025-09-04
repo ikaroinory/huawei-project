@@ -150,7 +150,6 @@ class Runner:
         label_list = []
 
         total_loss = 0
-        accuracy = 0
         for behavior, normal, abnormal, label in tqdm(dataloader):
             behavior = behavior.to(self.args.device)
             normal = normal.to(self.args.device)
@@ -164,8 +163,6 @@ class Runner:
             total_loss += loss.item() * behavior.shape[0]
 
             pred_labels = (torch.sigmoid(output) >= 0.5).long()
-
-            accuracy += (pred_labels == label).sum().item() / behavior.shape[0]
 
             pred_list.append(pred_labels)
             label_list.append(label)
