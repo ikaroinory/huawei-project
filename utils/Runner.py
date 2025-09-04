@@ -10,7 +10,7 @@ import pandas as pd
 import torch
 from sklearn.metrics import accuracy_score
 from torch import Tensor
-from torch.cuda.amp import GradScaler, autocast
+from torch.amp import GradScaler, autocast
 from torch.nn import BCEWithLogitsLoss
 from torch.optim import Adam
 from torch.utils.data import DataLoader, Subset
@@ -59,7 +59,6 @@ class Runner:
         )
         self.__loss = BCEWithLogitsLoss()
         self.__optimizer = Adam(self.__model.parameters(), lr=self.args.lr)
-
         self.scaler = GradScaler()
 
     def __set_seed(self) -> None:
