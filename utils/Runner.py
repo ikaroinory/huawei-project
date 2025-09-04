@@ -13,7 +13,7 @@ from torch import Tensor
 from torch.amp import GradScaler, autocast
 from torch.nn import BCEWithLogitsLoss
 from torch.optim import Adam
-from torch.utils.data import DataLoader, Subset
+from torch.utils.data import DataLoader, SequentialSampler, Subset
 from tqdm import tqdm
 
 from datasets import APIDataset
@@ -51,9 +51,9 @@ class Runner:
             d_hidden=self.args.d_hidden,
             num_heads=self.args.num_heads,
             num_layers=self.args.num_layers,
-            behavior_sequence_max_len=1000,
-            normal_sequence_max_len=5000,
-            abnormal_sequence_max_len=3000,
+            behavior_sequence_max_len=400,
+            normal_sequence_max_len=4600,
+            abnormal_sequence_max_len=700,
             dtype=self.args.dtype,
             device=self.args.device
         )
@@ -114,7 +114,7 @@ class Runner:
             dataset = APIDataset(x, normal_key_api_sequence, abnormal_key_api_sequence, y, dtype=self.args.dtype)
 
             if only_test:
-                return DataLoader(dataset, batch_size=self.args.batch_size, shuffle=False, worker_init_fn=lambda _: self.__set_seed()), None
+                return DataLoader(dataset, batch_size=self.args.batch_size, shuffle=False, sampler=SequentialSampler(dataset)), None
             else:
                 return self.__split_dataset(dataset)
 
