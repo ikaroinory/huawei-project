@@ -10,6 +10,7 @@ import pandas as pd
 import torch
 from sklearn.metrics import accuracy_score
 from torch import Tensor
+from torch.cuda.amp import GradScaler, autocast
 from torch.nn import BCEWithLogitsLoss
 from torch.optim import Adam
 from torch.utils.data import DataLoader, Subset
@@ -58,6 +59,8 @@ class Runner:
         )
         self.__loss = BCEWithLogitsLoss()
         self.__optimizer = Adam(self.__model.parameters(), lr=self.args.lr)
+
+        self.scaler = GradScaler()
 
     def __set_seed(self) -> None:
         random.seed(self.args.seed)
@@ -131,13 +134,14 @@ class Runner:
             label = label.to(self.args.device)
 
             self.__optimizer.zero_grad()
+            with autocast():
+                output = self.__model(behavior, normal, abnormal).squeeze()
 
-            output = self.__model(behavior, normal, abnormal).squeeze()
+                loss = self.__loss(output, label)
 
-            loss = self.__loss(output, label)
-            loss.backward()
-
-            self.__optimizer.step()
+            self.scaler.scale(loss).backward()
+            self.scaler.step(self.__optimizer)
+            self.scaler.update()
 
             total_loss += loss.item() * behavior.shape[0]
 
@@ -156,16 +160,18 @@ class Runner:
             abnormal = abnormal.to(self.args.device)
             label = label.to(self.args.device)
 
-            output = self.__model(behavior, normal, abnormal).squeeze()
+            with torch.no_grad():
+                with autocast():
+                    output = self.__model(behavior, normal, abnormal).squeeze()
 
-            loss = self.__loss(output, label)
+                    loss = self.__loss(output, label)
 
-            total_loss += loss.item() * behavior.shape[0]
+                total_loss += loss.item() * behavior.shape[0]
 
-            pred_labels = (torch.sigmoid(output) >= 0.5).long()
+                pred_labels = (torch.sigmoid(output) >= 0.5).long()
 
-            pred_list.append(pred_labels)
-            label_list.append(label)
+                pred_list.append(pred_labels)
+                label_list.append(label)
 
         pred_tensor = torch.cat(pred_list, dim=0)
         label_tensor = torch.cat(label_list, dim=0)
@@ -212,7 +218,7 @@ class Runner:
 
         Logger.info(f'Best epoch: {best_epoch}')
         Logger.info(f' - Test loss: {best_test_loss:.8f}')
-        Logger.info(f' - Accuracy: {best_accuracy:.2f}%')
+        Logger.info(f' - Accuracy: {best_accuracy * 100:.2f}%')
         Logger.info(f'Model save to {self.__model_path}')
 
     def __evaluate(self, model_path: Path, api_version_list: list[int]) -> None:
