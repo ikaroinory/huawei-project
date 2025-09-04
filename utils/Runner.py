@@ -157,7 +157,7 @@ class Runner:
 
             pred_labels = (torch.sigmoid(output) >= 0.5).long()
 
-            accuracy += (pred_labels == label).sum().item() * behavior.shape[0]
+            accuracy += (pred_labels == label).sum().item() / behavior.shape[0]
 
         return total_loss / len(dataloader.dataset), accuracy / len(dataloader.dataset)
 
@@ -199,7 +199,7 @@ class Runner:
 
         Logger.info(f'Best epoch: {best_epoch}')
         Logger.info(f' - Test loss: {best_test_loss:.8f}')
-        Logger.info(f' - Accuracy: {best_accuracy:.8f}')
+        Logger.info(f' - Accuracy: {best_accuracy:.2f}%')
         Logger.info(f'Model save to {self.__model_path}')
 
     def __evaluate(self, model_path: Path, api_version_list: list[int]) -> None:
