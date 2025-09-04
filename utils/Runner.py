@@ -133,7 +133,7 @@ class Runner:
             label = label.to(self.args.device)
 
             self.__optimizer.zero_grad()
-            with autocast():
+            with autocast(self.args.device):
                 output = self.__model(behavior, normal, abnormal).squeeze()
 
                 loss = self.__loss(output, label)
@@ -160,7 +160,7 @@ class Runner:
             label = label.to(self.args.device)
 
             with torch.no_grad():
-                with autocast():
+                with autocast(self.args.device):
                     output = self.__model(behavior, normal, abnormal).squeeze()
 
                     loss = self.__loss(output, label)
