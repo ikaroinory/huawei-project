@@ -14,6 +14,7 @@ class Detector(nn.Module):
         behavior_sequence_max_len: int,
         normal_sequence_max_len: int,
         abnormal_sequence_max_len: int,
+        dropout=0,
         *,
         dtype=None,
         device=None
@@ -27,6 +28,7 @@ class Detector(nn.Module):
                 d_output=d_hidden,
                 num_heads=num_heads,
                 num_layers=num_layers,
+                dropout=dropout,
                 max_len=behavior_sequence_max_len
             ),
             nn.ReLU()
@@ -38,6 +40,7 @@ class Detector(nn.Module):
                 d_output=d_hidden,
                 num_heads=num_heads,
                 num_layers=num_layers,
+                dropout=dropout,
                 max_len=normal_sequence_max_len
             ),
             nn.ReLU()
@@ -49,6 +52,7 @@ class Detector(nn.Module):
                 d_output=d_hidden,
                 num_heads=num_heads,
                 num_layers=num_layers,
+                dropout=dropout,
                 max_len=abnormal_sequence_max_len
             ),
             nn.ReLU()

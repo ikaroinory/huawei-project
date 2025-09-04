@@ -54,6 +54,7 @@ class Runner:
             behavior_sequence_max_len=400,
             normal_sequence_max_len=4600,
             abnormal_sequence_max_len=700,
+            dropout=self.args.dropout,
             dtype=self.args.dtype,
             device=self.args.device
         )
@@ -75,7 +76,7 @@ class Runner:
 
     @staticmethod
     def __get_api_count() -> int:
-        with open('data/processed/api_list.json', 'r') as f:
+        with open('data/api_list.json', 'r') as f:
             api_list = json.load(f)
         return len(api_list)
 
@@ -99,7 +100,7 @@ class Runner:
         return train_dataloader, test_dataloader
 
     def __get_dataloaders(self, api_version: int, only_test=False) -> tuple[DataLoader, DataLoader | None]:
-        with open(f'data/processed/api{api_version}.pkl', 'rb') as file:
+        with open(f'data/api{api_version}.pkl', 'rb') as file:
             df_train_data = pickle.load(file)
             df_train_data = pd.DataFrame(
                 df_train_data,
