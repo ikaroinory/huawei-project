@@ -1,8 +1,14 @@
 python main.py \
+  --seed 42 \
   -k \
   -b 32 \
-  -e 20 \
-  --d_hidden 768 \
+  -e 500 \
+  --d_hidden 512 \
+  --d_ff 1024 \
+  --d_embedding 1024 \
+  --num_heads 8 \
+  --num_layers 4 \
+  --test_size 0.2 \
   -l 0.0001 \
   --early_stop 10 \
-  --dropout 0
+  --dropout 0.1

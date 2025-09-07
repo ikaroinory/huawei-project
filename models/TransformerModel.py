@@ -10,23 +10,24 @@ class TransformerModel(nn.Module):
         d_input: int,
         d_hidden: int,
         d_output: int,
+        d_ff: int,
         num_heads: int,
         num_layers: int,
         dropout: float = 0,
         max_len: int = 5000
     ):
         super().__init__()
-        self.embedding = nn.Embedding(d_input, d_output)
+        self.embedding = nn.Embedding(d_input, d_hidden)
 
-        self.position_encoder = PositionEncoder(d_output, dropout, max_len)
+        self.position_encoder = PositionEncoder(d_hidden, dropout, max_len)
         self.transformer_encoder = nn.TransformerEncoder(
-            nn.TransformerEncoderLayer(d_model=d_output, nhead=num_heads, dim_feedforward=d_hidden, batch_first=True),
+            nn.TransformerEncoderLayer(d_model=d_hidden, nhead=num_heads, dim_feedforward=d_ff, dropout=dropout, batch_first=True),
             num_layers=num_layers
         )
 
-        self.output_layer = nn.Linear(d_output, d_output)
+        self.output_layer = nn.Linear(d_hidden, d_output)
 
-        self.d_hidden = d_output
+        self.d_hidden = d_hidden
 
     def forward(self, x: Tensor) -> Tensor:
         x = self.embedding(x) * torch.sqrt(torch.tensor(self.d_hidden, device=x.device))

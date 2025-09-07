@@ -21,6 +21,8 @@ class Arguments:
         self.epochs: int = args.epochs
 
         self.d_hidden: int = args.d_hidden
+        self.d_ff: int = args.d_ff
+        self.d_embedding: int = args.d_embedding
 
         self.num_heads: int = args.num_heads
         self.num_layers: int = args.num_layers
@@ -51,9 +53,11 @@ class Arguments:
         parser.add_argument('-e', '--epochs', type=int, default=20)
 
         parser.add_argument('--d_hidden', type=int, default=512)
+        parser.add_argument('--d_ff', type=int, default=1024)
+        parser.add_argument('--d_embedding', type=int, default=1024)
 
         parser.add_argument('--num_heads', type=int, default=8)
-        parser.add_argument('--num_layers', type=int, default=3)
+        parser.add_argument('--num_layers', type=int, default=4)
 
         parser.add_argument('--test_size', type=float, default=0.2)
 

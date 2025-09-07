@@ -49,6 +49,8 @@ class Runner:
         self.__model: Detector = Detector(
             d_input=self.api_count + 1,
             d_hidden=self.args.d_hidden,
+            d_ff=self.args.d_ff,
+            d_embedding=self.args.d_embedding,
             num_heads=self.args.num_heads,
             num_layers=self.args.num_layers,
             behavior_sequence_max_len=400,

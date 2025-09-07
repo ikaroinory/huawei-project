@@ -9,6 +9,8 @@ class Detector(nn.Module):
         self,
         d_input: int,
         d_hidden: int,
+        d_embedding: int,
+        d_ff: int,
         num_heads: int,
         num_layers: int,
         behavior_sequence_max_len: int,
@@ -25,7 +27,8 @@ class Detector(nn.Module):
             TransformerModel(
                 d_input=d_input,
                 d_hidden=d_hidden,
-                d_output=d_hidden,
+                d_output=d_embedding,
+                d_ff=d_ff,
                 num_heads=num_heads,
                 num_layers=num_layers,
                 dropout=dropout,
@@ -37,7 +40,8 @@ class Detector(nn.Module):
             TransformerModel(
                 d_input=d_input,
                 d_hidden=d_hidden,
-                d_output=d_hidden,
+                d_output=d_embedding,
+                d_ff=d_ff,
                 num_heads=num_heads,
                 num_layers=num_layers,
                 dropout=dropout,
@@ -49,7 +53,8 @@ class Detector(nn.Module):
             TransformerModel(
                 d_input=d_input,
                 d_hidden=d_hidden,
-                d_output=d_hidden,
+                d_output=d_embedding,
+                d_ff=d_ff,
                 num_heads=num_heads,
                 num_layers=num_layers,
                 dropout=dropout,
@@ -58,7 +63,7 @@ class Detector(nn.Module):
             nn.ReLU()
         )
 
-        self.output_layer = nn.Linear(d_hidden * 3, 1)
+        self.output_layer = nn.Linear(d_embedding * 3, 1)
 
         self.to(dtype)
         self.to(device)
