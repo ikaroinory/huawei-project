@@ -78,7 +78,7 @@ class Runner:
 
     @staticmethod
     def __get_api_count() -> int:
-        with open('data/api_list.json', 'r') as f:
+        with open('data/processed/api_list.json', 'r') as f:
             api_list = json.load(f)
         return len(api_list)
 
