@@ -231,7 +231,7 @@ class Runner:
         Logger.info(f'Accuracy:')
         for api_version in api_version_list:
             if api_version == self.train_api_version:
-                _, pred_tensor, label_tensor = self.__test_epoch(self.__train_dataloader)
+                _, pred_tensor, label_tensor = self.__test_epoch(self.__test_dataloader)
                 accuracy = self.get_accuracy(pred_tensor, label_tensor)
             else:
                 dataloader, _ = self.__get_dataloaders(api_version, only_test=True)
