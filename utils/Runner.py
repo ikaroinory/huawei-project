@@ -94,10 +94,10 @@ class Runner:
         test_indices = indices[test_start_index:test_start_index + test_dataset_size]
 
         train_subset = Subset(dataset, train_indices)
-        valid_subset = Subset(dataset, test_indices)
+        test_subset = Subset(dataset, test_indices)
 
         train_dataloader = DataLoader(train_subset, batch_size=self.args.batch_size, shuffle=True, worker_init_fn=lambda _: self.__set_seed())
-        test_dataloader = DataLoader(valid_subset, batch_size=self.args.batch_size, shuffle=False, worker_init_fn=lambda _: self.__set_seed())
+        test_dataloader = DataLoader(test_subset, batch_size=self.args.batch_size, shuffle=False, worker_init_fn=lambda _: self.__set_seed())
 
         return train_dataloader, test_dataloader
 
@@ -191,7 +191,7 @@ class Runner:
 
         for epoch in tqdm(range(self.args.epochs)):
             train_loss = self.__train_epoch()
-            test_loss, pred_tensor, label_tensor = self.__test_epoch(self.__train_dataloader)
+            test_loss, pred_tensor, label_tensor = self.__test_epoch(self.__test_dataloader)
 
             accuracy = self.get_accuracy(pred_tensor, label_tensor)
 
