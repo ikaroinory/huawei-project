@@ -3,34 +3,33 @@ import pickle
 from pathlib import Path
 
 import pandas as pd
-from loguru import logger
 
-from utils import init_logger
+from utils import Logger
 
 divider = '-' * 100
 
 
 def preprocess_api_list() -> None:
-    logger.info('Parsing API list...')
+    Logger.info('Parsing API list...')
 
     with open('data/original/api_list.json', 'r') as file:
         api_list = json.load(file)
     api_list = list(api_list.values())
 
-    logger.info(f'Original API count: {len(api_list)}')
+    Logger.info(f'Original API count: {len(api_list)}')
 
     api_list = list(set(api_list))
 
-    logger.info(f'Deduplicated Original API Count: {len(api_list)}')
+    Logger.info(f'Deduplicated Original API Count: {len(api_list)}')
 
     with open('data/processed/api_list.json', 'w') as file:
         file.write(json.dumps(api_list, indent=4))
 
-    logger.info('Saved API list: data/processed/api_list.json')
+    Logger.info('Saved API list: data/processed/api_list.json')
 
 
 def preprocess_api_index_mapping() -> None:
-    logger.info('Parsing API mapping...')
+    Logger.info('Parsing API mapping...')
 
     with open('data/processed/api_list.json', 'r') as file:
         api_list = json.load(file)
@@ -40,7 +39,7 @@ def preprocess_api_index_mapping() -> None:
     with open('data/processed/api_index_mapping.pkl', 'wb') as file:
         file.write(pickle.dumps(api_index_mapping))
 
-    logger.info('Saved API mapping: data/processed/api_index_mapping.pkl')
+    Logger.info('Saved API mapping: data/processed/api_index_mapping.pkl')
 
 
 def preprocess_train_data(data_path: str, output_path: str) -> None:
@@ -80,18 +79,18 @@ def preprocess_train_data(data_path: str, output_path: str) -> None:
 
         del item['key_api_sequence']
 
-    logger.info('Padding......')
+    Logger.info('Padding......')
     df = pd.DataFrame(train_data)
     padding(df, 'api_sequence')
     padding(df, 'normal_key_api_sequence')
     padding(df, 'abnormal_key_api_sequence')
 
-    logger.info('Loading API mapping......')
+    Logger.info('Loading API mapping......')
 
     with open('data/processed/api_index_mapping.pkl', 'rb') as file:
         api_index_mapping = pickle.load(file)
 
-    logger.info('Replace api to index......')
+    Logger.info('Replace api to index......')
 
     df['api_sequence'] = df['api_sequence'].apply(
         lambda x: [api_index_mapping.get(api, 0) for api in x]
@@ -106,44 +105,44 @@ def preprocess_train_data(data_path: str, output_path: str) -> None:
     with open(output_path, 'wb') as file:
         file.write(pickle.dumps(df.to_dict(orient='records')))
 
-    logger.info(f'Train data count: {len(df)}')
-    logger.info(f'Max api sequence length: {len(df.loc[0]["api_sequence"])}')
-    logger.info(
+    Logger.info(f'Train data count: {len(df)}')
+    Logger.info(f'Max api sequence length: {len(df.loc[0]["api_sequence"])}')
+    Logger.info(
         f'Max normal key api sub sequence length: {len(df.loc[0]["normal_key_api_sequence"])}'
     )
-    logger.info(
+    Logger.info(
         f'Max abnormal key api sub sequence length: {len(df.loc[0]["abnormal_key_api_sequence"])}'
     )
 
-    logger.info(f'Saved train data: {output_path}')
+    Logger.info(f'Saved train data: {output_path}')
 
 
 def preprocess() -> None:
-    logger.info(divider)
+    Logger.info(divider)
 
     preprocess_api_list()
-    logger.info(divider)
+    Logger.info(divider)
 
     preprocess_api_index_mapping()
-    logger.info(divider)
+    Logger.info(divider)
 
     preprocess_train_data(
         'data/original/api25.json',
         'data/processed/api25.pkl',
     )
-    logger.info(divider)
+    Logger.info(divider)
 
     preprocess_train_data(
         'data/original/api26.json',
         'data/processed/api26.pkl',
     )
-    logger.info(divider)
+    Logger.info(divider)
 
     preprocess_train_data(
         'data/original/api28.json',
         'data/processed/api28.pkl',
     )
-    logger.info(divider)
+    Logger.info(divider)
 
 
 def ensure_dir_exists() -> None:
@@ -154,7 +153,7 @@ def ensure_dir_exists() -> None:
 if __name__ == '__main__':
     ensure_dir_exists()
 
-    init_logger()
+    Logger.init()
 
-    logger.info('Data preprocessing...')
+    Logger.info('Data preprocessing...')
     preprocess()
