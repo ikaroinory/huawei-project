@@ -102,7 +102,7 @@ class Runner:
         return train_dataloader, test_dataloader
 
     def __get_dataloaders(self, api_version: int, only_test=False) -> tuple[DataLoader, DataLoader | None]:
-        with open(f'data/api{api_version}.pkl', 'rb') as file:
+        with open(f'data/processed/api{api_version}.pkl', 'rb') as file:
             df_train_data = pickle.load(file)
             df_train_data = pd.DataFrame(
                 df_train_data,
