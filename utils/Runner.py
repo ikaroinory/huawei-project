@@ -197,7 +197,7 @@ class Runner:
 
             Logger.info(f'Epoch {epoch + 1}:')
             Logger.info(f' - Train loss: {train_loss:.8f}')
-            Logger.info(f' - Test loss: {train_loss:.8f}')
+            Logger.info(f' - Test loss: {test_loss:.8f}')
 
             if test_loss < best_test_loss:
                 best_epoch = epoch + 1
