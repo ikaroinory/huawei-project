@@ -8,7 +8,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import torch
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, roc_auc_score
 from torch import Tensor
 from torch.amp import GradScaler, autocast
 from torch.nn import BCEWithLogitsLoss
@@ -122,8 +122,17 @@ class Runner:
                 return self.__split_dataset(dataset)
 
     @staticmethod
-    def get_accuracy(pred_tensor: Tensor, label_tensor: Tensor):
-        return accuracy_score(label_tensor.cpu(), pred_tensor.cpu())
+    def get_metrics(pred_tensor: Tensor, label_tensor: Tensor) -> list[float]:
+        label = label_tensor.cpu()
+        pred = pred_tensor.cpu()
+
+        return [
+            accuracy_score(label, pred),
+            precision_score(label, pred),
+            recall_score(label, pred),
+            f1_score(label, pred),
+            roc_auc_score(label, pred)
+        ]
 
     def __train_epoch(self) -> float:
         self.__model.train()
@@ -193,7 +202,7 @@ class Runner:
             train_loss = self.__train_epoch()
             test_loss, pred_tensor, label_tensor = self.__test_epoch(self.__test_dataloader)
 
-            accuracy = self.get_accuracy(pred_tensor, label_tensor)
+            accuracy = self.get_metrics(pred_tensor, label_tensor)
 
             Logger.info(f'Epoch {epoch + 1}:')
             Logger.info(f' - Train loss: {train_loss:.8f}')
@@ -228,17 +237,20 @@ class Runner:
 
         self.__model.load_state_dict(torch.load(f'{model_path}', weights_only=True))
 
-        Logger.info(f'Accuracy:')
+        metrics = []
         for api_version in api_version_list:
             if api_version == self.train_api_version:
                 _, pred_tensor, label_tensor = self.__test_epoch(self.__test_dataloader)
-                accuracy = self.get_accuracy(pred_tensor, label_tensor)
+                metrics.append(self.get_metrics(pred_tensor, label_tensor))
             else:
                 dataloader, _ = self.__get_dataloaders(api_version, only_test=True)
                 _, pred_tensor, label_tensor = self.__test_epoch(dataloader)
-                accuracy = self.get_accuracy(pred_tensor, label_tensor)
+                metrics.append(self.get_metrics(pred_tensor, label_tensor))
 
-            Logger.info(f' - API {api_version}: {accuracy * 100:.2f}%')
+        Logger.tabulate(
+            [[f'API {api}', *m] for api, m in zip(api_version_list, metrics)],
+            ['API Version', 'Accuracy', 'Precision', 'Recall', 'F1 Score', 'ROC AUC']
+        )
 
     def run(self) -> None:
         if self.args.model_path is None:
