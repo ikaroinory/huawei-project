@@ -8,7 +8,7 @@ python main.py \
   --d_embedding 1024 \
   --num_heads 8 \
   --num_layers 4 \
-  --test_size 0.2 \
+  --test_size 0.4 \
   -l 0.0001 \
-  --early_stop 10 \
+  --early_stop 20 \
   --dropout 0.1

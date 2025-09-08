@@ -59,11 +59,11 @@ class Arguments:
         parser.add_argument('--num_heads', type=int, default=8)
         parser.add_argument('--num_layers', type=int, default=4)
 
-        parser.add_argument('--test_size', type=float, default=0.2)
+        parser.add_argument('--test_size', type=float, default=0.4)
 
         parser.add_argument('-l', '--lr', type=float, default=0.0001)
 
-        parser.add_argument('--early_stop', type=int, default=10)
+        parser.add_argument('--early_stop', type=int, default=20)
         parser.add_argument('--dropout', type=float, default=0.1)
 
         parser.add_argument('--nolog', action='store_true')
