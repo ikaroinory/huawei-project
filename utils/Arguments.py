@@ -50,7 +50,7 @@ class Arguments:
         parser.add_argument('--device', type=str, choices=['cuda', 'cpu'], default='cuda')
 
         parser.add_argument('-b', '--batch_size', type=int, default=32)
-        parser.add_argument('-e', '--epochs', type=int, default=20)
+        parser.add_argument('-e', '--epochs', type=int, default=100)
 
         parser.add_argument('--d_hidden', type=int, default=512)
         parser.add_argument('--d_ff', type=int, default=1024)
@@ -59,9 +59,9 @@ class Arguments:
         parser.add_argument('--num_heads', type=int, default=8)
         parser.add_argument('--num_layers', type=int, default=4)
 
-        parser.add_argument('--test_size', type=float, default=0.4)
+        parser.add_argument('--test_size', type=float, default=0.2)
 
-        parser.add_argument('-l', '--lr', type=float, default=0.0001)
+        parser.add_argument('-l', '--lr', type=float, default=5e-5)
 
         parser.add_argument('--early_stop', type=int, default=20)
         parser.add_argument('--dropout', type=float, default=0.1)

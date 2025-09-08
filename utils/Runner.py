@@ -28,7 +28,7 @@ class Runner:
 
         self.start_time = datetime.now().strftime('%Y%m%d_%H%M%S')
 
-        self.__log_path = Path(f'logs/{self.args.mode}/{self.start_time}.log')
+        self.__log_path = Path(f'logs/{self.start_time}.log')
         self.__model_path = Path(f'saves/{self.args.mode}/{self.start_time}.pth')
 
         Logger.init(self.__log_path if self.args.log else None)
@@ -78,7 +78,7 @@ class Runner:
 
     @staticmethod
     def __get_api_count() -> int:
-        with open('data/processed/api_list.json', 'r') as f:
+        with open('data/api_list.json', 'r') as f:
             api_list = json.load(f)
         return len(api_list)
 
@@ -102,7 +102,7 @@ class Runner:
         return train_dataloader, test_dataloader
 
     def __get_dataloaders(self, api_version: int, only_test=False) -> tuple[DataLoader, DataLoader | None]:
-        with open(f'data/processed/api{api_version}.pkl', 'rb') as file:
+        with open(f'data/api{api_version}.pkl', 'rb') as file:
             df_train_data = pickle.load(file)
             df_train_data = pd.DataFrame(
                 df_train_data,

@@ -11,4 +11,5 @@ python main.py \
   --test_size 0.2 \
   -l 5e-5 \
   --early_stop 20 \
-  --dropout 0.1
+  --dropout 0.1 \
+  --model saves/key_subsequence/20250908_130410.pth
