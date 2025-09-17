@@ -17,12 +17,12 @@ class OptunaArguments:
         self.batch_size: int = 32
         self.epochs: int = 100
 
-        self.d_hidden: int = trial.suggest_int('d_hidden', 32, 1024)
-        self.d_ff: int = trial.suggest_int('d_ff', 32, 1024)
-        self.d_embedding: int = trial.suggest_int('d_embedding', 32, 1024)
+        self.d_hidden: int = trial.suggest_int('d_hidden', 32, 2048)
+        self.d_ff: int = trial.suggest_int('d_ff', 32, 2048)
+        self.d_embedding: int = trial.suggest_int('d_embedding', 32, 2048)
 
         self.num_heads: int = 8
-        self.num_layers: int = trial.suggest_categorical('num_layers', [1, 2, 3, 4, 5, 6, 7, 8])
+        self.num_layers: int = trial.suggest_int('num_layers', 1, 8)
 
         self.test_size: float = 0.2
 
