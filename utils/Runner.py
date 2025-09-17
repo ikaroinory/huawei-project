@@ -204,7 +204,7 @@ class Runner:
             train_loss = self.__train_epoch()
             test_loss, pred_tensor, label_tensor = self.__test_epoch(self.__test_dataloader)
 
-            accuracy = self.get_metrics(pred_tensor, label_tensor)
+            accuracy = self.get_metrics(pred_tensor, label_tensor)[0]
 
             Logger.info(f'Epoch {epoch + 1}:')
             Logger.info(f' - Train loss: {train_loss:.8f}')
