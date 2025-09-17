@@ -11,7 +11,7 @@ def objective(trial: Trial) -> list[float]:
 
 
 if __name__ == '__main__':
-    db_string = f'sqlite:///optuna.db'
+    db_string = f'sqlite:///./optuna.db'
     study = optuna.create_study()
 
     study.optimize(objective, n_trials=1000)
