@@ -22,7 +22,7 @@ class OptunaArguments:
         self.d_embedding: int = trial.suggest_int('d_embedding', 32, 2048)
 
         self.num_heads: int = 8
-        self.num_layers: int = trial.suggest_int('num_layers', 1, 8)
+        self.num_layers: int = 8
 
         self.test_size: float = 0.2
 
