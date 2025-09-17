@@ -8,6 +8,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import torch
+from optuna import Trial
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, roc_auc_score
 from torch import Tensor
 from torch.amp import GradScaler, autocast
@@ -20,11 +21,12 @@ from datasets import APIDataset
 from models import Detector
 from .Arguments import Arguments
 from .Logger import Logger
+from .OptunaArguments import OptunaArguments
 
 
 class Runner:
-    def __init__(self):
-        self.args = Arguments()
+    def __init__(self, trial: Trial = None):
+        self.args = Arguments() if trial is None else OptunaArguments(trial)
 
         self.start_time = datetime.now().strftime('%Y%m%d_%H%M%S')
 
@@ -232,12 +234,12 @@ class Runner:
         Logger.info(f' - Accuracy: {best_accuracy * 100:.2f}%')
         Logger.info(f'Model save to {self.__model_path}')
 
-    def __evaluate(self, model_path: Path, api_version_list: list[int]) -> None:
+    def __evaluate(self, model_path: Path, api_version_list: list[int]) -> list[float]:
         Logger.info('Evaluating...')
 
         self.__model.load_state_dict(torch.load(f'{model_path}', weights_only=True))
 
-        metrics = []
+        metrics: list[list[float]] = []
         for api_version in api_version_list:
             if api_version == self.train_api_version:
                 _, pred_tensor, label_tensor = self.__test_epoch(self.__test_dataloader)
@@ -252,9 +254,13 @@ class Runner:
             ['API Version', 'Accuracy', 'Precision', 'Recall', 'F1-score', 'ROC AUC']
         )
 
-    def run(self) -> None:
+        return [metric_list[0] for metric_list in metrics]
+
+    def run(self) -> list[float]:
         if self.args.model_path is None:
             self.__train()
-            self.__evaluate(self.__model_path, self.api_version_list)
+            acc_list = self.__evaluate(self.__model_path, self.api_version_list)
         else:
-            self.__evaluate(Path(self.args.model_path), self.api_version_list)
+            acc_list = self.__evaluate(Path(self.args.model_path), self.api_version_list)
+
+        return acc_list

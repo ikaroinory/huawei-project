@@ -11,7 +11,7 @@ class Arguments:
 
         self.model_path: str | None = args.model
 
-        self.key_subsequence = args.key_subsequence
+        self.key_subsequence: bool = args.key_subsequence
         self.mode = 'key_subsequence' if self.key_subsequence else 'normal'
 
         self.dtype = torch.float32 if args.dtype == 'float' else torch.float64
@@ -27,12 +27,12 @@ class Arguments:
         self.num_heads: int = args.num_heads
         self.num_layers: int = args.num_layers
 
-        self.test_size: int = args.test_size
+        self.test_size: float = args.test_size
 
-        self.lr = args.lr
+        self.lr: float = args.lr
 
         self.early_stop: int = args.early_stop
-        self.dropout: int = args.dropout
+        self.dropout: float = args.dropout
 
         self.log: bool = not args.nolog
 
