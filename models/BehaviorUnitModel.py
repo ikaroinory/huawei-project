@@ -14,7 +14,10 @@ class BehaviorUnitModel(nn.Module):
         num_heads: int,
         num_layers: int,
         dropout: float = 0,
-        max_len: int = 5000
+        max_len: int = 5000,
+        *,
+        dtype=None,
+        device=None
     ):
         super().__init__()
         self.embedding = nn.Embedding(d_input, d_hidden)
@@ -28,6 +31,9 @@ class BehaviorUnitModel(nn.Module):
         self.output_layer = nn.Linear(d_hidden, d_output)
 
         self.d_hidden = d_hidden
+
+        self.to(dtype)
+        self.to(device)
 
     def forward(self, x: Tensor) -> Tensor:
         x = self.embedding(x) * torch.sqrt(torch.tensor(self.d_hidden, device=x.device))
