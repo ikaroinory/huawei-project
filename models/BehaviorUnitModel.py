@@ -4,7 +4,7 @@ from torch import Tensor, nn
 from .PositionEncoder import PositionEncoder
 
 
-class BehaviorSequenceModel(nn.Module):
+class BehaviorUnitModel(nn.Module):
     def __init__(
         self,
         d_input: int,

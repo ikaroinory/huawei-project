@@ -8,9 +8,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import torch
-from optuna import Trial
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, roc_auc_score
-from torch import Tensor
+from torch import Tensor, nn
 from torch.amp import GradScaler, autocast
 from torch.nn import BCEWithLogitsLoss
 from torch.optim import Adam
@@ -19,19 +18,19 @@ from tqdm import tqdm
 
 from datasets import APIDataset
 from models import Detector
+from models.BehaviorUnitModel import BehaviorUnitModel
 from .Arguments import Arguments
 from .Logger import Logger
-from .OptunaArguments import OptunaArguments
 
 
 class Runner:
-    def __init__(self, trial: Trial = None):
-        self.args = Arguments() if trial is None else OptunaArguments(trial)
+    def __init__(self):
+        self.args = Arguments()
 
         self.start_time = datetime.now().strftime('%Y%m%d_%H%M%S')
 
-        self.__log_path = Path(f'logs/{self.start_time}.log')
-        self.__model_path = Path(f'saves/{self.start_time}.pth')
+        self.__log_path = Path(f'logs/{self.args.mode}/{self.start_time}.log')
+        self.__model_path = Path(f'saves/{self.args.mode}/{self.start_time}.pth')
 
         Logger.init(self.__log_path if self.args.log else None)
 
@@ -48,20 +47,32 @@ class Runner:
         self.__test_dataloader: DataLoader = test_dataloader
 
         Logger.info('Building model...')
-        self.__model: Detector = Detector(
-            d_input=self.api_count + 1,
-            d_hidden=self.args.d_hidden,
-            d_ff=self.args.d_ff,
-            d_embedding=self.args.d_embedding,
-            num_heads=self.args.num_heads,
-            num_layers=self.args.num_layers,
-            behavior_sequence_max_len=400,
-            normal_sequence_max_len=4600,
-            abnormal_sequence_max_len=700,
-            dropout=self.args.dropout,
-            dtype=self.args.dtype,
-            device=self.args.device
-        )
+        if self.args.key_subsequence is True:
+            self.__model: nn.Module = Detector(
+                d_input=self.api_count + 1,
+                d_hidden=self.args.d_hidden,
+                d_ff=self.args.d_ff,
+                d_embedding=self.args.d_embedding,
+                num_heads=self.args.num_heads,
+                num_layers=self.args.num_layers,
+                behavior_sequence_max_len=400,
+                normal_sequence_max_len=4600,
+                abnormal_sequence_max_len=700,
+                dropout=self.args.dropout,
+                dtype=self.args.dtype,
+                device=self.args.device
+            )
+        else:
+            self.__model: nn.Module = BehaviorUnitModel(
+                d_input=self.api_count + 1,
+                d_hidden=self.args.d_hidden,
+                d_output=1,
+                d_ff=self.args.d_ff,
+                num_heads=self.args.num_heads,
+                num_layers=self.args.num_layers,
+                dropout=self.args.dropout,
+                max_len=400
+            )
         self.__loss = BCEWithLogitsLoss()
         self.__optimizer = Adam(self.__model.parameters(), lr=self.args.lr)
         self.scaler = GradScaler()

@@ -1,7 +1,7 @@
 import torch
 from torch import Tensor, nn
 
-from .BehaviorSequenceModel import BehaviorSequenceModel
+from .BehaviorUnitModel import BehaviorUnitModel
 
 
 class Detector(nn.Module):
@@ -24,7 +24,7 @@ class Detector(nn.Module):
         super().__init__()
 
         self.behavior_sequence_encoder = nn.Sequential(
-            BehaviorSequenceModel(
+            BehaviorUnitModel(
                 d_input=d_input,
                 d_hidden=d_hidden,
                 d_output=d_embedding,
@@ -37,7 +37,7 @@ class Detector(nn.Module):
             nn.ReLU()
         )
         self.normal_encoder = nn.Sequential(
-            BehaviorSequenceModel(
+            BehaviorUnitModel(
                 d_input=d_input,
                 d_hidden=d_hidden,
                 d_output=d_embedding,
@@ -50,7 +50,7 @@ class Detector(nn.Module):
             nn.ReLU()
         )
         self.abnormal_encoder = nn.Sequential(
-            BehaviorSequenceModel(
+            BehaviorUnitModel(
                 d_input=d_input,
                 d_hidden=d_hidden,
                 d_output=d_embedding,

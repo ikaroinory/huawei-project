@@ -11,6 +11,9 @@ class Arguments:
 
         self.model_path: str | None = args.model
 
+        self.key_subsequence: bool = args.key_subsequence
+        self.mode = 'key_subsequence' if self.key_subsequence else 'normal'
+
         self.dtype = torch.float32 if args.dtype == 'float' else torch.float64
         self.device = args.device
 
@@ -40,6 +43,8 @@ class Arguments:
         parser.add_argument('--seed', type=int, default=42)
 
         parser.add_argument('--model', type=str)
+
+        parser.add_argument('-k', '--key_subsequence', action='store_true')
 
         parser.add_argument('--dtype', choices=['float', 'double'], default='float')
         parser.add_argument('--device', type=str, choices=['cuda', 'cpu'], default='cuda')
