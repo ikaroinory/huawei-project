@@ -8,9 +8,6 @@ class OptunaArguments:
 
         self.model_path: str | None = None
 
-        self.key_subsequence: bool = True
-        self.mode = 'key_subsequence' if self.key_subsequence else 'normal'
-
         self.dtype = torch.float32
         self.device = 'cuda'
 

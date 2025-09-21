@@ -31,7 +31,7 @@ class Runner:
         self.start_time = datetime.now().strftime('%Y%m%d_%H%M%S')
 
         self.__log_path = Path(f'logs/{self.start_time}.log')
-        self.__model_path = Path(f'saves/{self.args.mode}/{self.start_time}.pth')
+        self.__model_path = Path(f'saves/{self.start_time}.pth')
 
         Logger.init(self.__log_path if self.args.log else None)
 
