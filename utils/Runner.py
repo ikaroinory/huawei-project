@@ -71,7 +71,9 @@ class Runner:
                 num_heads=self.args.num_heads,
                 num_layers=self.args.num_layers,
                 dropout=self.args.dropout,
-                max_len=400
+                max_len=400,
+                dtype=self.args.dtype,
+                device=self.args.device
             )
         self.__loss = BCEWithLogitsLoss()
         self.__optimizer = Adam(self.__model.parameters(), lr=self.args.lr)
