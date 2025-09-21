@@ -159,7 +159,10 @@ class Runner:
 
             self.__optimizer.zero_grad()
             with autocast(self.args.device):
-                output = self.__model(behavior, normal, abnormal).squeeze()
+                if self.args.key_subsequence is True:
+                    output = self.__model(behavior, normal, abnormal).squeeze()
+                else:
+                    output = self.__model(behavior).squeeze()
 
                 loss = self.__loss(output, label)
 
@@ -186,7 +189,10 @@ class Runner:
 
             with torch.no_grad():
                 with autocast(self.args.device):
-                    output = self.__model(behavior, normal, abnormal).squeeze()
+                    if self.args.key_subsequence is True:
+                        output = self.__model(behavior, normal, abnormal).squeeze()
+                    else:
+                        output = self.__model(behavior).squeeze()
 
                     loss = self.__loss(output, label)
 
